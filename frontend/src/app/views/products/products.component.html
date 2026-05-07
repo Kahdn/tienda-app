@@ -1,0 +1,106 @@
+<div class="page">
+
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span>TiendaApp</span>
+    </div>
+    <div class="nav-right">
+      <span class="badge-rol" [class.badge-admin]="esAdmin">
+        {{ esAdmin ? 'Admin' : 'Usuario' }}
+      </span>
+      <span class="nav-user">{{ username }}</span>
+      <button class="btn-logout" (click)="logout()">Cerrar sesión</button>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h2>Catálogo de Productos</h2>
+      <p *ngIf="esAdmin">Tienes acceso de administrador.</p>
+      <p *ngIf="!esAdmin">Vista de solo lectura.</p>
+    </div>
+
+    <div class="loading" *ngIf="cargando">
+      <p>Cargando productos...</p>
+    </div>
+
+    <div class="alert-error" *ngIf="error && !cargando">
+      {{ error }}
+    </div>
+
+    <div class="table-wrapper" *ngIf="!cargando && !error">
+      <table class="tabla-productos">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th *ngIf="esAdmin">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of productos">
+            <td>{{ p.id }}</td>
+            <td>
+              <div class="producto-nombre">{{ p.nombre }}</div>
+              <div class="producto-desc">{{ p.descripcion }}</div>
+            </td>
+            <td><span class="chip">{{ p.categoria }}</span></td>
+            <td class="precio-cell">${{ p.precio }}</td>
+            <td>
+              <span class="stock-badge" [class.stock-bajo]="p.stock < 10">
+                {{ p.stock }}
+              </span>
+            </td>
+            <td *ngIf="esAdmin" class="acciones-cell">
+              <button class="btn-editar" (click)="abrirEdicion(p)">Editar</button>
+              <button class="btn-eliminar" (click)="eliminar(p.id)">Eliminar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <div class="modal-overlay" *ngIf="modalAbierto" (click)="cerrarModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Editar Producto</h3>
+        <button class="btn-close" (click)="cerrarModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field-group">
+          <label>Nombre</label>
+          <input type="text" [(ngModel)]="productoEditar.nombre" />
+        </div>
+        <div class="field-group">
+          <label>Descripción</label>
+          <textarea rows="3" [(ngModel)]="productoEditar.descripcion"></textarea>
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <label>Precio</label>
+            <input type="number" [(ngModel)]="productoEditar.precio" />
+          </div>
+          <div class="field-group">
+            <label>Stock</label>
+            <input type="number" [(ngModel)]="productoEditar.stock" />
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Categoría</label>
+          <input type="text" [(ngModel)]="productoEditar.categoria" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="cerrarModal()">Cancelar</button>
+        <button class="btn-save" (click)="guardarEdicion()" [disabled]="guardando">
+          {{ guardando ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
