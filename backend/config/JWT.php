@@ -1,0 +1,36 @@
+<?php
+class JWT {
+    private static string $secret = 'mi_clave_secreta_2024';
+
+    public static function encode(array $payload): string {
+        $header  = self::base64url(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));
+        $payload = self::base64url(json_encode($payload));
+        $sig     = self::base64url(hash_hmac('sha256', "$header.$payload", self::$secret, true));
+        return "$header.$payload.$sig";
+    }
+
+    public static function decode(string $token): array {
+        $parts = explode('.', $token);
+        if (count($parts) !== 3) {
+            throw new Exception('Token inválido');
+        }
+        [$header, $payload, $sig] = $parts;
+        $expectedSig = self::base64url(hash_hmac('sha256', "$header.$payload", self::$secret, true));
+        if (!hash_equals($expectedSig, $sig)) {
+            throw new Exception('Firma inválida');
+        }
+        $data = json_decode(self::base64urlDecode($payload), true);
+        if (isset($data['exp']) && $data['exp'] < time()) {
+            throw new Exception('Token expirado');
+        }
+        return $data;
+    }
+
+    private static function base64url(string $data): string {
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+    }
+
+    private static function base64urlDecode(string $data): string {
+        return base64_decode(strtr($data, '-_', '+/'));
+    }
+}
