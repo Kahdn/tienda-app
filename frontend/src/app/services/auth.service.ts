@@ -5,7 +5,8 @@ import { LoginRequest, LoginResponse, Usuario } from '../models/auth.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = 'http://localhost/tienda-app/backend/api';
+  private apiUrl = 'http://localhost/tienda-app/backend/api'; // El api url se debe de cargar desde un archivo externo
+  // crear un carpeta environments/ y dentro un archivo environment.ts y agrega las variables de entorno ahi
 
   constructor(private http: HttpClient) {}
 

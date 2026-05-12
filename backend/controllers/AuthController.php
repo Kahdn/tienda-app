@@ -4,6 +4,10 @@ require_once __DIR__ . '/../config/JWT.php';
 
 class AuthController {
     public function login(): void {
+
+        // Todos los métodos del controlador deben de incluir un try catch ya que el controlador
+        // puede fallar en cualquier punto
+
         $body = json_decode(file_get_contents('php://input'), true);
 
         $username = trim($body['username'] ?? '');

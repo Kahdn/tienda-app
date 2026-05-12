@@ -1,6 +1,8 @@
 <?php
 class JWT {
-    private static string $secret = 'mi_clave_secreta_2024';
+    private static string $secret = 'mi_clave_secreta_2024'; // Ninguna credencial o clave se debe de subir en el codigo
+    // Hay que instalar dotenv para cargar en un archivo .env las vartiables de entorno y mandar a llamar esas variables
+    // Solo asegurate de agregar el .env en el gitignore para que git no lo tracke y no lo subas al repo
 
     public static function encode(array $payload): string {
         $header  = self::base64url(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));

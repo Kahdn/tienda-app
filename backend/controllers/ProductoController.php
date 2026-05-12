@@ -40,6 +40,9 @@ class ProductoController {
     public function destroy(int $id): void {
         AuthMiddleware::verificar(['admin']);
 
+        // En produccion siempre se evita eliminar registros, en su lugar se hace un soft delete
+        // Modificalo para que en vez de eliminar actualice un campo activo a false
+
         $stmt = $this->db->prepare('DELETE FROM productos WHERE id = :id');
         $stmt->execute([':id' => $id]);
         echo json_encode(['message' => 'Producto eliminado']);
