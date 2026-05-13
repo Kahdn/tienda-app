@@ -10,41 +10,50 @@ class ProductoController {
     }
 
     public function index(): void {
-        AuthMiddleware::verificar();
-
-        $stmt = $this->db->query(
-            'SELECT id, nombre, descripcion, precio, stock, categoria FROM productos ORDER BY id'
-        );
-        echo json_encode($stmt->fetchAll());
+        try {
+            AuthMiddleware::verificar();
+            $stmt = $this->db->query(
+                'SELECT id, nombre, descripcion, precio, stock, categoria FROM productos WHERE activo = true ORDER BY id'
+            );
+            echo json_encode($stmt->fetchAll());
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Error al obtener productos']);
+        }
     }
 
     public function update(int $id): void {
-        AuthMiddleware::verificar(['admin']);
-
-        $body = json_decode(file_get_contents('php://input'), true);
-        $stmt = $this->db->prepare(
-            'UPDATE productos SET nombre = :nombre, descripcion = :descripcion,
-            precio = :precio, stock = :stock, categoria = :categoria WHERE id = :id'
-        );
-        $stmt->execute([
-            ':nombre' => $body['nombre'],
-            ':descripcion' => $body['descripcion'] ?? '',
-            ':precio' => $body['precio'],
-            ':stock' => $body['stock'] ?? 0,
-            ':categoria' => $body['categoria'] ?? '',
-            ':id' => $id,
-        ]);
-        echo json_encode(['message' => 'Producto actualizado']);
+        try {
+            AuthMiddleware::verificar(['admin']);
+            $body = json_decode(file_get_contents('php://input'), true);
+            $stmt = $this->db->prepare(
+                'UPDATE productos SET nombre = :nombre, descripcion = :descripcion,
+                 precio = :precio, stock = :stock, categoria = :categoria WHERE id = :id'
+            );
+            $stmt->execute([
+                ':nombre'      => $body['nombre'],
+                ':descripcion' => $body['descripcion'] ?? '',
+                ':precio'      => $body['precio'],
+                ':stock'       => $body['stock'] ?? 0,
+                ':categoria'   => $body['categoria'] ?? '',
+                ':id'          => $id,
+            ]);
+            echo json_encode(['message' => 'Producto actualizado']);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Error al actualizar producto']);
+        }
     }
 
     public function destroy(int $id): void {
-        AuthMiddleware::verificar(['admin']);
-
-        // En produccion siempre se evita eliminar registros, en su lugar se hace un soft delete
-        // Modificalo para que en vez de eliminar actualice un campo activo a false
-
-        $stmt = $this->db->prepare('DELETE FROM productos WHERE id = :id');
-        $stmt->execute([':id' => $id]);
-        echo json_encode(['message' => 'Producto eliminado']);
+        try {
+            AuthMiddleware::verificar(['admin']);
+            $stmt = $this->db->prepare('UPDATE productos SET activo = false WHERE id = :id');
+            $stmt->execute([':id' => $id]);
+            echo json_encode(['message' => 'Producto eliminado']);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Error al eliminar producto']);
+        }
     }
 }

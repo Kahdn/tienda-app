@@ -1,10 +1,14 @@
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
 require_once __DIR__ . '/controllers/AuthController.php';
 require_once __DIR__ . '/controllers/ProductoController.php';
 
 Flight::before('start', function () {
-    header('Access-Control-Allow-Origin: http://localhost:4200'); // El URL debe de cargarse desde el .env
+    header('Access-Control-Allow-Origin: ' . $_ENV['APP_URL']);
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, Authorization');
     header('Content-Type: application/json; charset=utf-8');

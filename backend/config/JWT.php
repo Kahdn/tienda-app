@@ -1,13 +1,13 @@
 <?php
 class JWT {
-    private static string $secret = 'mi_clave_secreta_2024'; // Ninguna credencial o clave se debe de subir en el codigo
-    // Hay que instalar dotenv para cargar en un archivo .env las vartiables de entorno y mandar a llamar esas variables
-    // Solo asegurate de agregar el .env en el gitignore para que git no lo tracke y no lo subas al repo
+    private static function getSecret(): string {
+        return $_ENV['JWT_SECRET'];
+    }
 
     public static function encode(array $payload): string {
         $header  = self::base64url(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));
         $payload = self::base64url(json_encode($payload));
-        $sig     = self::base64url(hash_hmac('sha256', "$header.$payload", self::$secret, true));
+        $sig     = self::base64url(hash_hmac('sha256', "$header.$payload", self::getSecret(), true));
         return "$header.$payload.$sig";
     }
 
@@ -17,7 +17,7 @@ class JWT {
             throw new Exception('Token inválido');
         }
         [$header, $payload, $sig] = $parts;
-        $expectedSig = self::base64url(hash_hmac('sha256', "$header.$payload", self::$secret, true));
+        $expectedSig = self::base64url(hash_hmac('sha256', "$header.$payload", self::getSecret(), true));
         if (!hash_equals($expectedSig, $sig)) {
             throw new Exception('Firma inválida');
         }

@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { LoginRequest, LoginResponse, Usuario } from '../models/auth.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = 'http://localhost/tienda-app/backend/api'; // El api url se debe de cargar desde un archivo externo
-  // crear un carpeta environments/ y dentro un archivo environment.ts y agrega las variables de entorno ahi
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
@@ -27,7 +27,8 @@ export class AuthService {
   }
 
   estaLogueado(): boolean {
-    return !!localStorage.getItem('token');
+    const token = this.getToken();
+    return !!token && token.trim() !== '';
   }
 
   getToken(): string | null {

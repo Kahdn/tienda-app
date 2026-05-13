@@ -18,6 +18,8 @@ CREATE TABLE productos (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+ALTER TABLE productos ADD COLUMN activo BOOLEAN DEFAULT true;
+
 INSERT INTO productos (nombre, descripcion, precio, stock, categoria) VALUES
 ('Laptop Pro 15"',    'Laptop de alto rendimiento con procesador i9', 25999.99, 10, 'Computadoras'),
 ('Mouse Inalámbrico', 'Mouse ergonómico con conexión Bluetooth',         599.00, 50, 'Periféricos'),

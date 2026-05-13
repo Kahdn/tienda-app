@@ -41,4 +41,4 @@ testem.log
 .DS_Store
 Thumbs.db
 
-# Aqui hay que agregar el .env para excluirlo cuando lo agregues
+.env

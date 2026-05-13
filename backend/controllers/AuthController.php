@@ -4,44 +4,45 @@ require_once __DIR__ . '/../config/JWT.php';
 
 class AuthController {
     public function login(): void {
+        try {
+            $body = json_decode(file_get_contents('php://input'), true);
 
-        // Todos los métodos del controlador deben de incluir un try catch ya que el controlador
-        // puede fallar en cualquier punto
+            $username = trim($body['username'] ?? '');
+            $password = trim($body['password'] ?? '');
 
-        $body = json_decode(file_get_contents('php://input'), true);
+            if ($username === '' || $password === '') {
+                http_response_code(400);
+                echo json_encode(['error' => 'Usuario y contraseña son requeridos']);
+                return;
+            }
 
-        $username = trim($body['username'] ?? '');
-        $password = trim($body['password'] ?? '');
+            $db   = (new Database())->connect();
+            $stmt = $db->prepare('SELECT id, username, password, rol FROM usuarios WHERE username = :u');
+            $stmt->execute([':u' => $username]);
+            $user = $stmt->fetch();
 
-        if ($username === '' || $password === '') {
-            http_response_code(400);
-            echo json_encode(['error' => 'Usuario y contraseña son requeridos']);
-            return;
+            if (!$user || !password_verify($password, $user['password'])) {
+                http_response_code(401);
+                echo json_encode(['error' => 'Credenciales incorrectas']);
+                return;
+            }
+
+            $token = JWT::encode([
+                'sub'      => $user['id'],
+                'username' => $user['username'],
+                'rol'      => $user['rol'],
+                'iat'      => time(),
+                'exp'      => time() + 3600,
+            ]);
+
+            echo json_encode([
+                'token'    => $token,
+                'username' => $user['username'],
+                'rol'      => $user['rol'],
+            ]);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Error interno del servidor']);
         }
-
-        $db = (new Database())->connect();
-        $stmt = $db->prepare('SELECT id, username, password, rol FROM usuarios WHERE username = :u');
-        $stmt->execute([':u'=> $username]);
-        $user = $stmt->fetch();
-
-        if (!$user || !password_verify($password, $user['password'])) {
-            http_response_code(401);
-            echo json_encode(['error' => 'Credenciales incorrectas']);
-            return;
-        }
-
-        $token = JWT::encode([
-            'sub' => $user['id'],
-            'username' => $user['username'],
-            'rol' => $user['rol'],
-            'iat' => time(),
-            'exp' => time() + 3600,
-        ]);
-
-        echo json_encode([
-            'token' => $token,
-            'username' => $user['username'],
-            'rol' => $user['rol'],
-        ]);
     }
 }
