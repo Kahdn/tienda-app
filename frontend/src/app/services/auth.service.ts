@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
-import { LoginRequest, LoginResponse, Usuario } from '../models/auth.model';
+import { Observable, tap, map } from 'rxjs';
+import { LoginRequest, LoginResponse, Usuario, ApiResponse } from '../models/auth.model';
 import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -11,7 +11,8 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
+    return this.http.post<ApiResponse<LoginResponse>>(`${this.apiUrl}/login`, credentials).pipe(
+      map(res => res.data),
       tap(res => {
         if (res && res.token) {
           localStorage.setItem('token', res.token);

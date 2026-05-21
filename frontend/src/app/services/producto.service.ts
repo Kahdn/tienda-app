@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Producto, ApiResponse } from '../models/producto.model';
 import { environment } from '../../environments/environment';
 
@@ -11,14 +11,20 @@ export class ProductoService {
   constructor(private http: HttpClient) {}
 
   getProductos(): Observable<Producto[]> {
-    return this.http.get<Producto[]>(this.apiUrl);
+    return this.http.get<{ status: string; data: Producto[] }>(this.apiUrl).pipe(
+      map(res => res.data)
+    );
   }
 
   eliminar(id: number): Observable<ApiResponse> {
-    return this.http.delete<ApiResponse>(`${this.apiUrl}/${id}`);
+    return this.http.delete<{ status: string; data: ApiResponse }>(`${this.apiUrl}/${id}`).pipe(
+      map(res => res.data)
+    );
   }
 
   actualizar(id: number, producto: Partial<Producto>): Observable<ApiResponse> {
-    return this.http.put<ApiResponse>(`${this.apiUrl}/${id}`, producto);
+    return this.http.put<{ status: string; data: ApiResponse }>(`${this.apiUrl}/${id}`, producto).pipe(
+      map(res => res.data)
+    );
   }
 }

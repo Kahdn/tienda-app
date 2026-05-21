@@ -4,8 +4,8 @@ require_once __DIR__ . '/vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
-require_once __DIR__ . '/controllers/AuthController.php';
-require_once __DIR__ . '/controllers/ProductoController.php';
+require_once __DIR__ . '/app/modules/auth/AuthController.php';
+require_once __DIR__ . '/app/modules/productos/ProductoController.php';
 
 Flight::before('start', function () {
     header('Access-Control-Allow-Origin: ' . $_ENV['APP_URL']);

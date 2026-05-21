@@ -13,3 +13,8 @@ export interface Usuario {
     username: string;
     rol: 'admin' | 'user';
 }
+
+export interface ApiResponse<T> {
+  status: string;
+  data: T;
+}

@@ -1,5 +1,5 @@
 <?php
-class JWT {
+class JwtService {
     private static function getSecret(): string {
         return $_ENV['JWT_SECRET'];
     }
